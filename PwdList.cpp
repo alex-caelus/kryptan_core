@@ -137,7 +137,7 @@ Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& user
             throw KryptanDuplicatePwdException("A password already exist with that name!");
     }
 
-    Pwd* pwd = new Pwd();
+    Pwd* pwd = new Pwd(this);
     pwd->SetDescription(desciption);
     pwd->SetUsername(username);
     pwd->SetPassword(password);
@@ -217,4 +217,15 @@ bool PwdList::RemovePwdFromLabel(Pwd* pwd, SecureString label)
         existingLabels.remove(label);
     }
     return false;
+}
+
+bool PwdList::ValidateDescription(Pwd* pwd, const SecureString& newDescription)
+{
+	//check if pwd is unique
+	for (auto it = pwds.begin(); it != pwds.end(); it++)
+	{
+		if ((*it) != pwd && (*it)->GetDescription().equals(newDescription))
+			return false;
+	}
+	return true;
 }

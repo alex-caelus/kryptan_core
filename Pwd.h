@@ -11,10 +11,21 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include "Exceptions.h"
 #include "SecureString.h"
 
 namespace Kryptan {
-    namespace Core {
+	namespace Core {
+
+		//forward declaration
+		class Pwd;
+
+		namespace Internal{
+			class PwdDescriptionValidator{
+			public:
+				virtual bool ValidateDescription(Pwd* pwd, const SecureString &newDescription) = 0;
+			};
+		}
 
         typedef std::vector<SecureString> PwdLabelVector;
 
@@ -35,7 +46,7 @@ namespace Kryptan {
             PwdLabelVector GetLabels() { return PwdLabelVector(mLabels.begin(), mLabels.end()); }
 
         private:
-            Pwd();
+			Pwd(Internal::PwdDescriptionValidator* validator);
             Pwd(const Pwd& orig);
             virtual ~Pwd();
 
@@ -47,7 +58,8 @@ namespace Kryptan {
             SecureString mPassword;
 
             std::list<SecureString> mLabels;
-        };
+			Internal::PwdDescriptionValidator* mValidator;
+		};
     }
 }
 

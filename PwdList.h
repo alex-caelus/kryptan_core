@@ -9,7 +9,7 @@
 namespace Kryptan {
     namespace Core {
 
-        class PwdList {
+        class PwdList : Internal::PwdDescriptionValidator{
             //this clas can only be created by PwdFile
             friend class PwdFileWorker;
         public:
@@ -32,6 +32,8 @@ namespace Kryptan {
             
             bool AddPwdToLabel(Pwd* pwd, SecureString label);
             bool RemovePwdFromLabel(Pwd* pwd, SecureString label);
+
+			bool ValidateDescription(Pwd* pwd, const SecureString& newDescription) override;
 
         private:
             PwdList(void);

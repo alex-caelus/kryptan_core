@@ -9,13 +9,15 @@
 
 using namespace Kryptan::Core;
 
-Pwd::Pwd() {
+Pwd::Pwd(Internal::PwdDescriptionValidator* validator) {
+	this->mValidator = validator;
 }
 
 Pwd::Pwd(const Pwd& orig) {
 	mDescription.assign(orig.mDescription);
 	mUsername.assign(orig.mUsername);
 	mPassword.assign(orig.mPassword);
+	mValidator = orig.mValidator;
 }
 
 Pwd::~Pwd() {
@@ -39,7 +41,14 @@ SecureString Pwd::GetPassword() const
 
 void Pwd::SetDescription(const SecureString& desc)
 {
-	mDescription.assign(desc);
+	if (mValidator->ValidateDescription(this, desc))
+	{
+		mDescription.assign(desc);
+	}
+	else
+	{
+		throw KryptanDuplicatePwdException("A password with that description already exists!");
+	}
 }
 
 void Pwd::SetUsername(const SecureString& usrname)
