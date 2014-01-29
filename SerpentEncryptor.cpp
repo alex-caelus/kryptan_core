@@ -41,7 +41,7 @@ using CryptoPP::PKCS5_PBKDF2_HMAC;
 //while developing
 //using namespace CryptoPP;
 
-#define MAGIC_VALUE "KRYPTAN|"
+#define MAGIC_VALUE "KRYPTAN\n"
 
 const int TAG_SIZE = 16; //bytes
 const int IV_SIZE = 16; //bytes
