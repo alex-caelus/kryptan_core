@@ -25,7 +25,7 @@ namespace Kryptan {
         class PwdFileWorker {
         public:
             static void ReadFile(std::string filename, int& length, char*& buffer);
-            static void WriteFile(std::string filename, char* content, int length);
+            static void WriteFile(std::string filename, const char* content, int length);
             static bool FileExists(std::string filename);
             static PwdList* ParseFileContents(SecureString content);
             static PwdList* ParseFileContentsOldFormat(SecureString content);

@@ -55,7 +55,7 @@ void PwdFileWorker::ReadFile(string filename, int& length, char*& buffer)
     }
 }
 
-void PwdFileWorker::WriteFile(string filename, char* content, int length)
+void PwdFileWorker::WriteFile(string filename, const char* content, int length)
 {
     std::ofstream os;
     try

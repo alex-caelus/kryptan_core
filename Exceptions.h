@@ -62,10 +62,31 @@ namespace Kryptan
 			}
 		};
 
+		class KryptanEncryptException : public KryptanBaseException
+		{
+		public:
+			KryptanEncryptException(const std::string& msg)
+				: KryptanBaseException(msg)
+			{
+			}
+		};
+
+		/*
+		 * Deprecated, use KryptanDecryptMacBadException instead.
+		 */
 		class KryptanDecryptWrongKeyException : public KryptanDecryptException
 		{
 		public:
 			KryptanDecryptWrongKeyException(const std::string& msg)
+				: KryptanDecryptException(msg)
+			{
+			}
+		};
+
+		class KryptanDecryptMacBadException : public KryptanDecryptException
+		{
+		public:
+			KryptanDecryptMacBadException(const std::string& msg)
 				: KryptanDecryptException(msg)
 			{
 			}

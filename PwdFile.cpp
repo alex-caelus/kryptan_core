@@ -1,4 +1,5 @@
 #include "PwdFile.h"
+#include "SerpentEncryptor.h"
 #include "ModifiedEncryptor.h"
 #include "PwdFileWorker.h"
 #include <cryptopp/hex.h>
@@ -48,8 +49,26 @@ void PwdFile::OpenAndParse(SecureString masterkey, bool useOldFormat)
         //open file and read it's content
         PwdFileWorker::ReadFile(filename, encryptedBufferLength, encryptedBuffer);
 
+		//destination
+		SecureString decryptedString;
+
         //decrypt the contents
-        SecureString decryptedString = PwdFileWorker::Decrypt(encryptedBuffer, encryptedBufferLength, masterkey);
+		try{
+			Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseFixedSalt(masterkey, encryptedBuffer);
+			decryptedString = Internal::SerpentEncryptor::Decrypt(encryptedBuffer, key);
+		}
+		catch (KryptanDecryptMacBadException &eOrig)
+		{
+			//Let's try to be backwards compatible
+			try{
+				decryptedString = PwdFileWorker::Decrypt(encryptedBuffer, encryptedBufferLength, masterkey);
+			}
+			catch (KryptanDecryptWrongKeyException)
+			{
+				//no that didn't work either, so let's just report the original error and continue
+				throw eOrig;
+			}
+		}
         
         //delete the encrypted buffer
         delete[] encryptedBuffer;
@@ -113,10 +132,11 @@ void PwdFile::Save(SecureString masterkey)
     }
     content.append(RootTagEnd);
 
-    int eLength;
-    char* encrypted = PwdFileWorker::Encrypt(content, eLength, masterkey);
+	Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey);
+	std::string encrypted = Internal::SerpentEncryptor::Encrypt(content, key);
+    //char* encrypted = PwdFileWorker::Encrypt(content, eLength, masterkey);
 
-    PwdFileWorker::WriteFile(filename, encrypted, eLength);
+	PwdFileWorker::WriteFile(filename, encrypted.data(), encrypted.length());
 }
 
 PwdList* PwdFile::GetPasswordList()

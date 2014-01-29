@@ -153,6 +153,9 @@ namespace Kryptan {
              * This copy is Mutable and can be modified. On UnsecuredStringFinsished()
              * the modifications will be imported to the internal representation of
              * this SecureString.
+			 * NOTE: The string length will be equal to length() and not allocated()
+			 * Increasing the length by writing past the end of the buffer will result
+			 * in heap corruption.
              * @return pointer to an unsecured plaintext string, NULL on failure
              */
             ssarr getUnsecureStringM();
