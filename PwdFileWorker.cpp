@@ -343,7 +343,7 @@ char* PwdFileWorker::Encrypt(SecureString data, int& encryptedLength, SecureStri
     }
 }
 
-SecureString PwdFileWorker::Decrypt(char* encryptedBuffer, int encryptedBufferLength, SecureString masterkey)
+SecureString PwdFileWorker::Decrypt(const char* encryptedBuffer, int encryptedBufferLength, SecureString masterkey)
 {
     char* unsafeDecrypt = 0;
     int outputLength;

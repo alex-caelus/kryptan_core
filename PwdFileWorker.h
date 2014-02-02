@@ -34,7 +34,7 @@ namespace Kryptan {
             static SecureString EscapeTags(const SecureString& str);
             static SecureString UnescapeTags(const char* str, int length);
             static char* Encrypt(SecureString content, int& encryptedLength, SecureString masterkey);
-            static SecureString Decrypt(char* encryptedBuffer, int encryptedBufferLength, SecureString masterkey);
+            static SecureString Decrypt(const char* encryptedBuffer, int encryptedBufferLength, SecureString masterkey);
             static void DeletePwdList(PwdList* list);
         private:
         };

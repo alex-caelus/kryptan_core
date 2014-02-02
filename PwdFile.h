@@ -16,6 +16,9 @@ namespace Kryptan {
             void CreateNew();
             void OpenAndParse(SecureString masterkey, bool useOldFormat = false);
             void Save(SecureString masterkey);
+			std::string SaveToString(SecureString masterkey);
+			SecureString GetCurrentContent();
+			void ReplaceContent(SecureString masterkey, std::string content);
 
             PwdList* GetPasswordList();
             std::string GetFilename();
