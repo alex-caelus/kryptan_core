@@ -1,3 +1,4 @@
+#ifndef KRYPTAN_CORE_DO_NOT_USE_SERVER
 #include "Server.h"
 #include <algorithm>
 #include <cstdio>
@@ -202,3 +203,5 @@ Server* Server::CreateServer(int port, std::string& serveContent)
 {
 	return new ServerImpl(port, serveContent);
 }
+
+#endif
