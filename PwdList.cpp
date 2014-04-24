@@ -147,6 +147,14 @@ Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& user
     return pwd;
 }
 
+Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified)
+{
+	Pwd* pwd = CreatePwd(desciption, username, password);
+	pwd->SetCTime(created);
+	pwd->SetMTime(modified);
+	return pwd;
+}
+
 void PwdList::DeletePwd(Pwd* pwd)
 {
     auto labels = pwd->GetLabels();

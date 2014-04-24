@@ -5,11 +5,12 @@
 #include <stdexcept>
 #include <stack>          // std::stack
 #include <deque>          // std::deque
+#include <sstream>
+#include <ctime>
 
 using namespace Kryptan::Core;
 using namespace std;
 using namespace CryptoPP;
-
 
 void PwdFileWorker::ReadFile(string filename, int& length, char*& buffer)
 {
@@ -97,7 +98,13 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
     SecureString currDescription;
     SecureString currUsername;
     SecureString currPassword;
+	time_t currMtime;
+	time_t currCtime;
     PwdLabelVector currLabels;
+
+	//for backwards compability
+	time_t dummyCreationDate = time(0);
+	int passwordsWithoutCreationDates = 0;
     
     try{
         do{
@@ -119,6 +126,8 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
                     currDescription.assign("", 0);
                     currUsername.assign("", 0);
                     currPassword.assign("", 0);
+					currCtime = 0;
+					currMtime = 0;
                     currLabels.clear();
                     currState = PASSWORD;
                 }
@@ -172,7 +181,35 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
                         throw KryptanFileContentException("Password file is corrupt");
                     }
                     currTag = contentEnd;
-                }
+				}
+				else if (strncmp(currTag, TimeCreatedTagStart, currTagLength) == 0){
+					char* contentBegin = currTag + currTagLength;
+					char* contentEnd = GetNextTagStart(contentBegin);
+					int contentLength = contentEnd - contentBegin;
+					int endLength = GetTagLength(contentEnd);
+					if (strncmp(contentEnd, TimeCreatedTagEnd, endLength) == 0)
+					{
+						currCtime = stringToTime(contentBegin, contentLength);
+					}
+					else{
+						throw KryptanFileContentException("Password file is corrupt");
+					}
+					currTag = contentEnd;
+				}
+				else if (strncmp(currTag, TimeModifiedTagStart, currTagLength) == 0){
+					char* contentBegin = currTag + currTagLength;
+					char* contentEnd = GetNextTagStart(contentBegin);
+					int contentLength = contentEnd - contentBegin;
+					int endLength = GetTagLength(contentEnd);
+					if (strncmp(contentEnd, TimeModifiedTagEnd, endLength) == 0)
+					{
+						currMtime = stringToTime(contentBegin, contentLength);
+					}
+					else{
+						throw KryptanFileContentException("Password file is corrupt");
+					}
+					currTag = contentEnd;
+				}
                 else if(strncmp(currTag, LabelTagStart, currTagLength) == 0){
                     char* contentBegin = currTag + currTagLength;
                     char* contentEnd = GetNextTagStart(contentBegin);
@@ -189,8 +226,19 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
                 }
                 else if(strncmp(currTag, PwdTagEnd, currTagLength) == 0){
                     //validate what information we have
-                    //and save it
-                    Pwd* p = target->CreatePwd(currDescription, currUsername, currPassword);
+					if (currCtime == 0)
+					{
+						//create dummy creation date
+						currCtime = dummyCreationDate - (passwordsWithoutCreationDates++);
+					}
+					if (currMtime == 0)
+					{
+						//create dummy modification date
+						currMtime = currCtime;
+					}
+
+					//and save it
+					Pwd* p = target->CreatePwd(currDescription, currUsername, currPassword, currCtime, currMtime);
 
                     for(PwdLabelVector::iterator it = currLabels.begin(); it != currLabels.end(); it++)
                     {
@@ -320,6 +368,27 @@ SecureString PwdFileWorker::UnescapeTags(const char* str, int l)
     }
 
     return copy;
+}
+
+time_t PwdFileWorker::stringToTime(char* start, int length)
+{
+	time_t t;
+	std::stringstream str(std::string(start, length));
+	str >> t;
+	if (!str)
+	{
+		throw KryptanFileContentException("Password file is corrupt!");
+	}
+	return t;
+}
+
+SecureString PwdFileWorker::TimeToString(time_t time)
+{
+	string t;
+	std::ostringstream str;
+	str << time;
+	//no need to securely delete this, it is not information that needs protecting
+	return SecureString(str.str().c_str());
 }
 
 char* PwdFileWorker::Encrypt(SecureString data, int& encryptedLength, SecureString masterkey) {

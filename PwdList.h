@@ -40,6 +40,9 @@ namespace Kryptan {
             ~PwdList(void);
             PwdList(const PwdList& obj);
 
+			//only accessible to PwdFileWorker
+			Pwd* CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified);
+
             std::list<Pwd*> pwds;
             std::list<SecureString> existingLabels;
 

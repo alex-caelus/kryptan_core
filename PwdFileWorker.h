@@ -18,6 +18,10 @@
 #define PasswordTagEnd "</password>"
 #define LabelTagStart "<label>"
 #define LabelTagEnd "</label>"
+#define TimeCreatedTagStart "<created>"
+#define TimeCreatedTagEnd "</created>"
+#define TimeModifiedTagStart "<modified>"
+#define TimeModifiedTagEnd "</modified>"
 
 namespace Kryptan {
     namespace Core {
@@ -32,7 +36,9 @@ namespace Kryptan {
             static char* GetNextTagStart(const char* pos);
             static int GetTagLength(const char* tagStart);
             static SecureString EscapeTags(const SecureString& str);
-            static SecureString UnescapeTags(const char* str, int length);
+			static SecureString UnescapeTags(const char* str, int length);
+			static time_t stringToTime(char* start, int length);
+			static SecureString TimeToString(time_t time);
             static char* Encrypt(SecureString content, int& encryptedLength, SecureString masterkey);
             static SecureString Decrypt(const char* encryptedBuffer, int encryptedBufferLength, SecureString masterkey);
             static void DeletePwdList(PwdList* list);

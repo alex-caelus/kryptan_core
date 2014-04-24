@@ -1,4 +1,9 @@
 #ifndef KRYPTAN_CORE_DO_NOT_USE_SERVER
+
+#ifdef _WIN32
+#define _WIN32_WINNT 0x0501
+#endif
+
 #include "Server.h"
 #include <algorithm>
 #include <cstdio>
@@ -21,7 +26,7 @@ public:
 		io_ser(io_ser),
 		acceptor(*io_ser, tcp::endpoint(tcp::v4(), port)),
 		socket(*io_ser),
-		servableContent(serveContent)
+		servableContent(serveContent + Server::STOPSTRING)
 	{
 	}
 
@@ -175,11 +180,14 @@ public:
 
 	void AbortAsyncServe() override
 	{
-		io_ser->stop();
-		thread->interrupt();
-		thread->join();
-		delete thread;
-		thread = NULL;
+		if (thread)
+		{
+			io_ser->stop();
+			thread->interrupt();
+			thread->join();
+			delete thread;
+			thread = NULL;
+		}
 	}
 
 	std::string getRecievedContent() override

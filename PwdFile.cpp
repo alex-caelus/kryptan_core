@@ -150,6 +150,16 @@ SecureString PwdFile::GetCurrentContent()
 		content.append(PwdFileWorker::EscapeTags((*pwd)->GetPassword()));
 		content.append(PasswordTagEnd);
 
+		//Created time
+		content.append(TimeCreatedTagStart);
+		content.append(PwdFileWorker::TimeToString((*pwd)->GetTimeCreated()));
+		content.append(TimeCreatedTagEnd);
+
+		//Modified Time
+		content.append(TimeModifiedTagStart);
+		content.append(PwdFileWorker::TimeToString((*pwd)->GetTimeLastModified()));
+		content.append(TimeModifiedTagEnd);
+
 		//labels
 		auto labels = (*pwd)->GetLabels();
 		for (auto label = labels.begin(); label != labels.end(); label++)
