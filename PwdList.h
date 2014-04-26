@@ -35,6 +35,8 @@ namespace Kryptan {
 
 			bool ValidateDescription(Pwd* pwd, const SecureString& newDescription) override;
 
+			void ImportPwd(Pwd* pwd);
+
         private:
             PwdList(void);
             ~PwdList(void);

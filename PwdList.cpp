@@ -237,3 +237,17 @@ bool PwdList::ValidateDescription(Pwd* pwd, const SecureString& newDescription)
 	}
 	return true;
 }
+
+void PwdList::ImportPwd(Pwd* pwd)
+{
+	if (pwd == NULL)
+		return;
+
+	Pwd* imported = CreatePwd(pwd->GetDescription, pwd->GetUsername(), pwd->GetPassword(), pwd->GetTimeCreated(), pwd->GetTimeLastModified());
+	auto label = pwd->GetLabels();
+
+	for (auto it = label.begin(); it != label.end(); it++)
+	{
+		AddPwdToLabel(imported, *it);
+	}
+}
