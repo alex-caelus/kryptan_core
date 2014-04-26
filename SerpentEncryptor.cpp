@@ -159,14 +159,14 @@ EncryptionKeyImpl* generateKeyFromPassphrase_p(SecureString passphrase, SecByteB
 	return new EncryptionKeyImpl(derived_key, derived_key.size(), salt, salt.size(), actualIterationCount);
 }
 
-EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseRandomSalt(SecureString passphrase)
+EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseRandomSalt(SecureString passphrase, int mashIterations)
 {
 	SecByteBlock salt(SALT_SIZE);
 
 	//generate salt
 	g_prng.GenerateBlock(salt, salt.size());
 
-	return generateKeyFromPassphrase_p(passphrase, salt);
+	return generateKeyFromPassphrase_p(passphrase, salt, mashIterations);
 }
 
 EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseFixedSalt(SecureString passphrase, std::string filecontents)

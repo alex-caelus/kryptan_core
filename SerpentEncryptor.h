@@ -20,7 +20,7 @@ namespace Kryptan{
 			public:
 				//This is the most CPUintensive part of the encryption/decryption process
 				//thus is has been extracted so that the result can be cached.
-				static EncryptionKey* generateKeyFromPassphraseRandomSalt(SecureString passphrase);
+				static EncryptionKey* generateKeyFromPassphraseRandomSalt(SecureString passphrase, int mashIterations = 0);
 				static EncryptionKey* generateKeyFromPassphraseFixedSalt(SecureString passphrase, std::string filecontents);
 
 				//Returns a encrypted, null terminated and HEX-encoded char array

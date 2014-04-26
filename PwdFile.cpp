@@ -118,11 +118,11 @@ void PwdFile::Save(SecureString masterkey)
 	PwdFileWorker::WriteFile(filename, encrypted.data(), encrypted.length());
 }
 
-std::string PwdFile::SaveToString(SecureString masterkey)
+std::string PwdFile::SaveToString(SecureString masterkey, int mashIterations)
 {
 	SecureString content = GetCurrentContent();
 
-	Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey);
+	Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey, mashIterations);
 	return Internal::SerpentEncryptor::Encrypt(content, key);
 }
 
