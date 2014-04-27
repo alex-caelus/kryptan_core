@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <stdint.h>
+#include <mutex>
 
 namespace Kryptan {
     namespace Core {
@@ -101,7 +102,8 @@ namespace Kryptan {
              * Assignment operator
              */
             inline SecureString&  operator= (const SecureString& other)
-            {
+			{
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 assign(other);
                 return *this;
             }
@@ -185,7 +187,8 @@ namespace Kryptan {
              * @param pos - the position in the string to return
              * @return character at position pos, 0 on failure
              */
-            inline ssbyte at(ssnr pos) const {
+			inline ssbyte at(ssnr pos) const {
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 if (pos < length())
                     return _key[pos] ^_data[pos];
                 else
@@ -196,7 +199,8 @@ namespace Kryptan {
              * This returns the current length of the string, excluding trailing null character
              * @return length of string
              */
-            inline ssnr length() const {
+			inline ssnr length() const {
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return ((ssnr) * _key) ^ _length;
             }
 
@@ -204,7 +208,8 @@ namespace Kryptan {
              * This returns the current amount of allocated bytes.
              * @return size of momory block
              */
-            inline ssnr allocated() const{
+			inline ssnr allocated() const{
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return ((ssnr) * _key) ^ _allocated;
             }
 
@@ -220,7 +225,8 @@ namespace Kryptan {
              * the next cal to getUnsecureNextline() will return the first line
              * in the string.
              */
-            void resetLinefeedPosition() {
+			void resetLinefeedPosition() {
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 _nexlinefeedposition = ((ssnr) * _key) ^ 0;
             }
 
@@ -239,7 +245,8 @@ namespace Kryptan {
             bool equals(const char* s2) const;
 
             bool operator==(const SecureString& other) const
-            {
+			{
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return equals(other);
             }
 
@@ -248,7 +255,8 @@ namespace Kryptan {
              * @param s2 - the string to compare with
              * @return the corresponding checksum of the string
              */
-            ssnr checksum() const{
+			ssnr checksum() const{
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return _checksum;
             }
 
@@ -264,6 +272,9 @@ namespace Kryptan {
             ssnr _nexlinefeedposition;
             ssnr _checksum;
             bool _mutableplaintextcopy;
+
+			//only allow one thread to access this object at a time
+			mutable std::recursive_mutex mutex_lock;
         };
     }
 }

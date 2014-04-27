@@ -18,31 +18,37 @@ DWORD crc32buf(const char *buf, size_t len);
 using namespace Kryptan::Core;
 
 SecureString::SecureString(void){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     init();
 }
 
 SecureString::SecureString(ssnr size){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     init();
     allocate(size);
 }
 
 SecureString::SecureString(ssarr str, ssnr maxlen, bool deleteStr){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     init();
     assign(str, maxlen, deleteStr);
 }
 
 SecureString::SecureString(c_ssarr str, ssnr maxlen){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     init();
     assign(str, maxlen);
 }
 
 SecureString::SecureString(const SecureString& src){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     init();
     assign(src);
 }
 
 SecureString::~SecureString(void)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //Destroy all unsecured data
     UnsecuredStringFinished();
 
@@ -58,6 +64,7 @@ SecureString::~SecureString(void)
 }
 
 void SecureString::init(){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     _data = new ssbyte[sizeof(ssnr)];
     _key  = new ssbyte[sizeof(ssnr)];
     //fill key with zeros, this keeps the length() and allocated() from failing before any call to allocate(x)
@@ -71,6 +78,7 @@ void SecureString::init(){
 }
 
 void SecureString::allocate(ssnr size){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //increase size by one to include last '\0'
     size += 1;
     //the new array must at least be able to hold a key the size of ssnr
@@ -118,6 +126,7 @@ void SecureString::allocate(ssnr size){
 }
 
 void SecureString::append(ssarr str, ssnr maxlen, bool deleteStr){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //set len to strlen(str) or maxlen, wichever is lowest (except if maxlen is 0 then set len to strlen(0))
     ssnr len = (maxlen == 0) ? strlen(str) : std::min((ssnr)strlen(str), maxlen);
     ssnr oldlen = length();
@@ -145,10 +154,12 @@ void SecureString::append(ssarr str, ssnr maxlen, bool deleteStr){
 }
 
 void SecureString::append(c_ssarr str, ssnr maxlen){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     append((ssarr)str, maxlen, false);
 }
 
 void SecureString::append(const SecureString& str){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     ssnr len = str.length();
     ssnr oldlen = this->length();
     ssnr totlen = oldlen + len;
@@ -170,6 +181,7 @@ void SecureString::append(const SecureString& str){
 }
 
 void SecureString::assign(ssarr str, ssnr maxlen, bool deleteStr){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //set len to strlen(str) or maxlen, wichever is lowest (except if maxlen is 0 then set len to strlen(0))
     ssnr len = (maxlen == 0) ? strlen(str) : std::min((ssnr)strlen(str), maxlen);
 
@@ -200,10 +212,12 @@ void SecureString::assign(ssarr str, ssnr maxlen, bool deleteStr){
 }
 
 void SecureString::assign(c_ssarr str, ssnr maxlen){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     assign((ssarr)str, maxlen, false);
 }
 
 void SecureString::assign(const SecureString& str){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //remove old data
     if(length() > 0){
         ssnr oldlen = length();
@@ -226,6 +240,7 @@ void SecureString::assign(const SecureString& str){
 }
 
 SecureString::c_ssarr SecureString::getUnsecureString(){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //there can only be one unsecure plaintext copy at a time
     if(_plaintextcopy != NULL)
         return NULL;
@@ -240,12 +255,14 @@ SecureString::c_ssarr SecureString::getUnsecureString(){
 }
 
 SecureString::ssarr SecureString::getUnsecureStringM(){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     ssarr ret = (ssarr)getUnsecureString();
     _mutableplaintextcopy = true;
     return ret;
 }
 
 SecureString::c_ssarr SecureString::getUnsecureNextline(){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //there can only be one unsecure plaintext copy at a time
     if(_plaintextcopy != NULL)
         return NULL;
@@ -287,6 +304,7 @@ SecureString::c_ssarr SecureString::getUnsecureNextline(){
 }
 
 void SecureString::UnsecuredStringFinished(){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(_plaintextcopy == NULL)
         return;
     if(_mutableplaintextcopy){
@@ -299,6 +317,7 @@ void SecureString::UnsecuredStringFinished(){
 }
 
 bool SecureString::equals(const SecureString& s2) const{
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(s2.length() != this->length()){
         return false;
     }
@@ -306,6 +325,7 @@ bool SecureString::equals(const SecureString& s2) const{
 }
 
 bool SecureString::equals(const char* s2) const{
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     unsigned int len = this->length();
     if(strlen(s2) != len){
         return false;

@@ -47,11 +47,13 @@ bool myLabelcompare(SecureString a, SecureString b)
 
 PwdList::PwdList(void)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 }
 
 
 PwdList::~PwdList(void)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     for(auto it=pwds.begin(); it != pwds.end(); it++)
     {
         delete (*it);
@@ -60,27 +62,32 @@ PwdList::~PwdList(void)
 
 PwdList::PwdList(const PwdList& obj)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     throw std::logic_error("Not implemented");
 }
 
 PwdList::PwdVector PwdList::All()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     pwds.sort(myPwdCompare);
     return PwdVector(pwds.begin(), pwds.end());
 }
 
 PwdList::PwdVector PwdList::Filter(const SecureString& pattern)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return Filter(pattern, PwdLabelVector());
 }
 
 PwdList::PwdVector PwdList::Filter(const PwdLabelVector& labels)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return Filter(SecureString(), labels);
 }
 
 PwdList::PwdVector PwdList::Filter(const SecureString& pattern, const PwdLabelVector& labels)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     PwdVector filtered;
     if(pattern.length() > 0)
     {
@@ -125,11 +132,13 @@ PwdList::PwdVector PwdList::Filter(const SecureString& pattern, const PwdLabelVe
 
 Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& password)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return CreatePwd(desciption, SecureString(), password);
 }
 
 Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     //check if pwd is unique
     for(auto it = pwds.begin(); it != pwds.end(); it++)
     {
@@ -149,6 +158,7 @@ Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& user
 
 Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	Pwd* pwd = CreatePwd(desciption, username, password);
 	pwd->SetCTime(created);
 	pwd->SetMTime(modified);
@@ -157,6 +167,8 @@ Pwd* PwdList::CreatePwd(const SecureString& desciption, const SecureString& user
 
 void PwdList::DeletePwd(Pwd* pwd)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	auto sizeBefore = pwds.size();
     auto labels = pwd->GetLabels();
     for(auto label = labels.begin(); label != labels.end(); label++)
     {
@@ -164,16 +176,20 @@ void PwdList::DeletePwd(Pwd* pwd)
     }
     pwds.remove(pwd);
     delete pwd;
+	if (pwds.size() < sizeBefore - 1)
+		throw KryptanBaseException("DeletePwd removed more than one password, something probably went seriously wrong!");
 }
 
 PwdLabelVector PwdList::AllLabels()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     existingLabels.sort(myLabelcompare);
     return PwdLabelVector(existingLabels.begin(), existingLabels.end());
 }
             
 PwdLabelVector PwdList::FilterLabels(SecureString pattern)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     PwdLabelVector vector;
     const char* strPtrn = pattern.getUnsecureString();
     for(auto it = existingLabels.begin(); it != existingLabels.end(); it++)
@@ -192,11 +208,13 @@ PwdLabelVector PwdList::FilterLabels(SecureString pattern)
 
 int PwdList::CountPwds()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return pwds.size();
 }
 
 int PwdList::CountPwds(const SecureString& label)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     int count = 0;
     for(auto it = pwds.begin(); it != pwds.end(); it++)
     {
@@ -209,6 +227,7 @@ int PwdList::CountPwds(const SecureString& label)
             
 bool PwdList::AddPwdToLabel(Pwd* pwd, SecureString label)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(std::find(existingLabels.begin(), existingLabels.end(), label) == existingLabels.end())
     {
         existingLabels.push_back(label);
@@ -219,6 +238,7 @@ bool PwdList::AddPwdToLabel(Pwd* pwd, SecureString label)
 
 bool PwdList::RemovePwdFromLabel(Pwd* pwd, SecureString label)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     pwd->RemoveLabel(label);
     if(CountPwds(label) == 0)
     {
@@ -229,6 +249,7 @@ bool PwdList::RemovePwdFromLabel(Pwd* pwd, SecureString label)
 
 bool PwdList::ValidateDescription(Pwd* pwd, const SecureString& newDescription)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	//check if pwd is unique
 	for (auto it = pwds.begin(); it != pwds.end(); it++)
 	{
@@ -240,6 +261,7 @@ bool PwdList::ValidateDescription(Pwd* pwd, const SecureString& newDescription)
 
 void PwdList::ImportPwd(Pwd* pwd)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	if (pwd == NULL)
 		return;
 

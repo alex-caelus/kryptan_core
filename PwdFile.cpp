@@ -13,6 +13,7 @@ using namespace CryptoPP;
 
 PwdFile::PwdFile(string filename)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     this->filename = filename;
     list = NULL;
     isOpen = false;
@@ -21,15 +22,18 @@ PwdFile::PwdFile(string filename)
 
 PwdFile::~PwdFile(void)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     PwdFileWorker::DeletePwdList(list);
 }
 
 PwdFile::PwdFile(const PwdFile& obj)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 }
 
 void PwdFile::CreateNew()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(isOpen)
         throw logic_error("File is already open!");
 
@@ -72,6 +76,7 @@ PwdList* DecryptAndParse(SecureString masterkey, const char* encryptedBuffer, in
 
 void PwdFile::OpenAndParse(SecureString masterkey, bool useOldFormat)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     char* encryptedBuffer = 0;
     int encryptedBufferLength;
     try{
@@ -99,6 +104,7 @@ void PwdFile::OpenAndParse(SecureString masterkey, bool useOldFormat)
 
 void PwdFile::ReplaceContent(SecureString masterkey, std::string newContent)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	//delete current list
 	PwdList* newList = DecryptAndParse(masterkey, newContent.data(), newContent.length(), false);
 	PwdFileWorker::DeletePwdList(list);
@@ -107,6 +113,7 @@ void PwdFile::ReplaceContent(SecureString masterkey, std::string newContent)
 
 void PwdFile::Save(SecureString masterkey)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(!isOpen)
         throw logic_error("File must be opened before Save() can be called!");
 
@@ -120,6 +127,7 @@ void PwdFile::Save(SecureString masterkey)
 
 std::string PwdFile::SaveToString(SecureString masterkey, int mashIterations)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	SecureString content = GetCurrentContent();
 
 	Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey, mashIterations);
@@ -128,6 +136,7 @@ std::string PwdFile::SaveToString(SecureString masterkey, int mashIterations)
 
 SecureString PwdFile::GetCurrentContent()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	SecureString content(RootTagStart);
 
 	auto pwds = list->All();
@@ -177,6 +186,7 @@ SecureString PwdFile::GetCurrentContent()
 
 PwdList* PwdFile::GetPasswordList()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     if(!isOpen)
         throw logic_error("File must be opened before GetPasswordList() can be called!");
     return list;
@@ -184,15 +194,18 @@ PwdList* PwdFile::GetPasswordList()
 
 string PwdFile::GetFilename()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return filename;
 }
 
 bool PwdFile::IsOpen()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return isOpen;
 }
 
 bool PwdFile::Exists()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     return PwdFileWorker::FileExists(filename);
 }

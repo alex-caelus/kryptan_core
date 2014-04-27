@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <mutex>
 #include "Pwd.h"
 #include "SecureString.h"
 
@@ -47,6 +48,9 @@ namespace Kryptan {
 
             std::list<Pwd*> pwds;
             std::list<SecureString> existingLabels;
+
+			//only allow one thread to access this object at a time
+			std::recursive_mutex mutex_lock;
 
         };
     }

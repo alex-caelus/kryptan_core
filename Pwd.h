@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <mutex>
 #include "Exceptions.h"
 #include "SecureString.h"
 
@@ -47,8 +48,14 @@ namespace Kryptan {
             void SetUsername(const SecureString& usrname);
             void SetPassword(const SecureString& passwd);
 
-            bool HasLabel(const SecureString& label){return std::find(mLabels.begin(), mLabels.end(), label) != mLabels.end();}
-            PwdLabelVector GetLabels() { return PwdLabelVector(mLabels.begin(), mLabels.end()); }
+			bool HasLabel(const SecureString& label){
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
+				return std::find(mLabels.begin(), mLabels.end(), label) != mLabels.end();
+			}
+			PwdLabelVector GetLabels() {
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
+				return PwdLabelVector(mLabels.begin(), mLabels.end());
+			}
 
         private:
 			Pwd(Internal::PwdDescriptionValidator* validator);
@@ -57,8 +64,14 @@ namespace Kryptan {
 
 			void SetCTime(time_t);
 			void SetMTime(time_t);
-            void AddLabel(const SecureString& label){if(!HasLabel(label)) mLabels.push_back(label);}
-            void RemoveLabel(const SecureString& label){mLabels.remove(label);}
+			void AddLabel(const SecureString& label){
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
+				if (!HasLabel(label)) mLabels.push_back(label);
+			}
+			void RemoveLabel(const SecureString& label){
+				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
+				mLabels.remove(label);
+			}
 
 
 			void SetDescriptionNoMTime(const SecureString& desc);
@@ -76,6 +89,9 @@ namespace Kryptan {
 
             std::list<SecureString> mLabels;
 			Internal::PwdDescriptionValidator* mValidator;
+
+			//only allow one thread to access this object at a time
+			mutable std::recursive_mutex mutex_lock;
 		};
     }
 }

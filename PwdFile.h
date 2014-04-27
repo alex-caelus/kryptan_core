@@ -32,7 +32,10 @@ namespace Kryptan {
             std::string filename;
             PwdList* list;
 
-            bool isOpen;
+			bool isOpen;
+
+			//only allow one thread to access this object at a time
+			std::recursive_mutex mutex_lock;
         };
 
     }
