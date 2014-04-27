@@ -153,3 +153,24 @@ void Pwd::SetCTime(time_t t)
 	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
 	mTimeCreated = t;
 }
+
+void Pwd::AddLabel(const SecureString& label){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	updateMTime();
+}
+
+void Pwd::RemoveLabel(const SecureString& label){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	mLabels.remove(label);
+	updateMTime();
+}
+
+void Pwd::AddLabelNoMTime(const SecureString& label){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	if (!HasLabel(label)) mLabels.push_back(label);
+}
+
+void Pwd::RemoveLabelNoMTime(const SecureString& label){
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	mLabels.remove(label);
+}

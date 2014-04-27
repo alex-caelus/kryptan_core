@@ -45,6 +45,8 @@ namespace Kryptan {
 
 			//only accessible to PwdFileWorker
 			Pwd* CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified);
+			//only accessible to PwdFileWorker
+			bool AddPwdToLabelNoMTime(Pwd* pwd, SecureString label);
 
             std::list<Pwd*> pwds;
             std::list<SecureString> existingLabels;

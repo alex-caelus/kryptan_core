@@ -242,7 +242,7 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
 
                     for(PwdLabelVector::iterator it = currLabels.begin(); it != currLabels.end(); it++)
                     {
-                        target->AddPwdToLabel(p, *it);
+						target->AddPwdToLabelNoMTime(p, *it);
                     }
 
                     //change state

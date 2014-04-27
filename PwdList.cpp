@@ -236,6 +236,17 @@ bool PwdList::AddPwdToLabel(Pwd* pwd, SecureString label)
     return false;
 }
 
+bool PwdList::AddPwdToLabelNoMTime(Pwd* pwd, SecureString label)
+{
+	std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+	if (std::find(existingLabels.begin(), existingLabels.end(), label) == existingLabels.end())
+	{
+		existingLabels.push_back(label);
+	}
+	pwd->AddLabelNoMTime(label);
+	return false;
+}
+
 bool PwdList::RemovePwdFromLabel(Pwd* pwd, SecureString label)
 {
 	std::lock_guard<std::recursive_mutex> lock(mutex_lock);

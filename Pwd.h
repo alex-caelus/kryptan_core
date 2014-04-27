@@ -64,14 +64,10 @@ namespace Kryptan {
 
 			void SetCTime(time_t);
 			void SetMTime(time_t);
-			void AddLabel(const SecureString& label){
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
-				if (!HasLabel(label)) mLabels.push_back(label);
-			}
-			void RemoveLabel(const SecureString& label){
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
-				mLabels.remove(label);
-			}
+			void AddLabel(const SecureString& label);
+			void RemoveLabel(const SecureString& label);
+			void AddLabelNoMTime(const SecureString& label);
+			void RemoveLabelNoMTime(const SecureString& label);
 
 
 			void SetDescriptionNoMTime(const SecureString& desc);
