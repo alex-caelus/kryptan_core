@@ -186,7 +186,7 @@ EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseFixedSalt(SecureString
 	int offset = 0;
 
 	std::string decoded;
-	BufferedTransformation* source = new StringSource(filecontents.substr(sizeof(MAGIC_VALUE)-1), true, new Base64Decoder(new StringSink(decoded)));
+	StringSource source(filecontents.substr(sizeof(MAGIC_VALUE)-1), true, new Base64Decoder(new StringSink(decoded)));
 
 	//get password itereation count
 	iter_t iteration_count = *reinterpret_cast<const iter_t*>(decoded.data());
@@ -194,7 +194,7 @@ EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseFixedSalt(SecureString
 	//get password salt
 	SecByteBlock pwdSalt(reinterpret_cast<const byte*>(decoded.substr(offset, SALT_SIZE).data()), SALT_SIZE);
 
-	assert(pwdSalt.size() == SALT_SIZE);
+	assert(pwdSalt.size() == (unsigned int)SALT_SIZE);
 
 	return generateKeyFromPassphrase_p(passphrase, pwdSalt, iteration_count);
 }
@@ -314,7 +314,7 @@ SecureString SerpentEncryptor::Decrypt(std::string data, EncryptionKey* key)
 		}
 		//source
 		std::string decoded;
-		BufferedTransformation* source = new StringSource(data.substr(sizeof(MAGIC_VALUE)-1), true, new Base64Decoder(new StringSink(decoded)));
+		StringSource source(data.substr(sizeof(MAGIC_VALUE)-1), true, new Base64Decoder(new StringSink(decoded)));
 
 		//DATA FORMAT
 		//|            plaintext           |             encrypted            |  plain |    <-- confidentiality level
@@ -334,9 +334,9 @@ SecureString SerpentEncryptor::Decrypt(std::string data, EncryptionKey* key)
 		std::string mac = decoded.substr(decoded.length() - TAG_SIZE);
 
 		//post-data exraction sanity checks
-		assert(iv.size() == IV_SIZE);
+		assert(iv.size() == (unsigned int)IV_SIZE);
 		assert(encrypted.size() > 0);
-		assert(mac.size() == TAG_SIZE);
+		assert(mac.size() == (unsigned int)TAG_SIZE);
 
 		//get keydata
 		EncryptionKeyImpl* keyImpl = static_cast<EncryptionKeyImpl*>(key);
@@ -370,7 +370,7 @@ SecureString SerpentEncryptor::Decrypt(std::string data, EncryptionKey* key)
 		df.SetRetrievalChannel(DEFAULT_CHANNEL);
 		auto totaldecryptedsize = df.MaxRetrievable();
 
-		if (totaldecryptedsize < KEY_CHECK_LENGTH)
+		if (totaldecryptedsize < (unsigned int)KEY_CHECK_LENGTH)
 		{
 			throw KryptanDecryptMacBadException("Error while decrypting: Cannot find keycheck data!");
 		}

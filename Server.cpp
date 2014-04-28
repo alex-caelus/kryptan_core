@@ -22,10 +22,10 @@ class ServerTask
 {
 public:
 	ServerTask(int port, std::string& serveContent, io_service* io_ser)
-		: currentState(Server::WAITING_FOR_START),
-		io_ser(io_ser),
+		: io_ser(io_ser),
 		acceptor(*io_ser, tcp::endpoint(tcp::v4(), port)),
 		socket(*io_ser),
+                currentState(Server::WAITING_FOR_START),
 		servableContent(serveContent + Server::STOPSTRING)
 	{
 	}
@@ -153,9 +153,8 @@ private:
 class ServerImpl : public Server
 {
 public:
-	ServerImpl::ServerImpl(int port, std::string& serveContent)
-		: io_ser(new io_service()), task(port, serveContent, io_ser),
-		thread(NULL)
+	ServerImpl(int port, std::string& serveContent)
+		: io_ser(new io_service()), thread(NULL), task(port, serveContent, io_ser)
 	{
 	}
 

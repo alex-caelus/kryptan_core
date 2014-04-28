@@ -40,7 +40,7 @@ namespace Kryptan {
 
         private:
             PwdList(void);
-            ~PwdList(void);
+            virtual ~PwdList(void);
             PwdList(const PwdList& obj);
 
 			//only accessible to PwdFileWorker

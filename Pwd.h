@@ -25,6 +25,7 @@ namespace Kryptan {
 			class PwdDescriptionValidator{
 			public:
 				virtual bool ValidateDescription(Pwd* pwd, const SecureString &newDescription) = 0;
+                                virtual ~PwdDescriptionValidator(){};
 			};
 		}
 

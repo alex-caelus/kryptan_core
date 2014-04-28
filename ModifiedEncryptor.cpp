@@ -85,8 +85,10 @@ ModifiedEncryptor::ModifiedEncryptor(const byte *passphrase, size_t passphraseLe
 void ModifiedEncryptor::FirstPut(const byte *)
 {
 	// VC60 workaround: __LINE__ expansion bug
+#ifdef _WIN32
 	CRYPTOPP_COMPILE_ASSERT_INSTANCE(SALTLENGTH <= (unsigned int)ModifiedHashModule::DIGESTSIZE, 1);
 	CRYPTOPP_COMPILE_ASSERT_INSTANCE(BLOCKSIZE <= (unsigned int)ModifiedHashModule::DIGESTSIZE, 2);
+#endif
 
 	SecByteBlock salt(ModifiedHashModule::DIGESTSIZE), keyCheck(ModifiedHashModule::DIGESTSIZE);
 	ModifiedHashModule hash;
