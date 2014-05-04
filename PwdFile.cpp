@@ -51,6 +51,8 @@ PwdList* DecryptAndParse(SecureString masterkey, const char* encryptedBuffer, in
     try{
         Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseFixedSalt(masterkey, encryptedBuffer);
         decryptedString = Internal::SerpentEncryptor::Decrypt(encryptedBuffer, key);
+
+        PwdFileWorker::ConvertToLocalEncoding(decryptedString);
     }
     catch (KryptanDecryptMacBadException &eOrig)
     {
@@ -119,6 +121,8 @@ void PwdFile::Save(SecureString masterkey)
 
     SecureString content = GetCurrentContent();
 
+    PwdFileWorker::ConvertToStorageEncoding(content);
+
     Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey);
     std::string encrypted = Internal::SerpentEncryptor::Encrypt(content, key);
 
@@ -129,6 +133,8 @@ std::string PwdFile::SaveToString(SecureString masterkey, int mashIterations)
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_lock);
     SecureString content = GetCurrentContent();
+
+    PwdFileWorker::ConvertToStorageEncoding(content);
 
     Internal::EncryptionKey* key = Internal::SerpentEncryptor::generateKeyFromPassphraseRandomSalt(masterkey, mashIterations);
     return Internal::SerpentEncryptor::Encrypt(content, key);

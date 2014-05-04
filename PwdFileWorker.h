@@ -28,6 +28,8 @@ namespace Kryptan {
 
         class PwdFileWorker {
         public:
+            static void ConvertToStorageEncoding(SecureString& data);
+            static void ConvertToLocalEncoding(SecureString data);
             static void ReadFile(std::string filename, int& length, char*& buffer);
             static void WriteFile(std::string filename, const char* content, int length);
             static bool FileExists(std::string filename);

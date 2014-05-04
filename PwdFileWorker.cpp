@@ -12,6 +12,121 @@ using namespace Kryptan::Core;
 using namespace std;
 using namespace CryptoPP;
 
+#ifdef _WIN32
+#include <windows.h>
+
+// 65001 is utf-8.
+wchar_t *CodePageToUnicode(int codePage, const char *src)
+{
+    if (!src) return 0;
+    int srcLen = strlen(src);
+    if (!srcLen)
+    {
+        wchar_t *w = new wchar_t[1];
+        w[0] = 0;
+        return w;
+    }
+
+    int requiredSize = MultiByteToWideChar(codePage,
+        0,
+        src, srcLen, 0, 0);
+
+    if (!requiredSize)
+    {
+        return 0;
+    }
+
+    wchar_t *w = new wchar_t[requiredSize + 1];
+    w[requiredSize] = 0;
+
+    int retval = MultiByteToWideChar(codePage,
+        0,
+        src, srcLen, w, requiredSize);
+    if (!retval)
+    {
+        delete[] w;
+        return 0;
+    }
+
+    return w;
+}
+
+char *UnicodeToCodePage(int codePage, const wchar_t *src)
+{
+    if (!src) return 0;
+    int srcLen = wcslen(src);
+    if (!srcLen)
+    {
+        char *x = new char[1];
+        x[0] = '\0';
+        return x;
+    }
+
+    int requiredSize = WideCharToMultiByte(codePage,
+        0,
+        src, srcLen, 0, 0, 0, 0);
+
+    if (!requiredSize)
+    {
+        return 0;
+    }
+
+    char *x = new char[requiredSize + 1];
+    x[requiredSize] = 0;
+
+    int retval = WideCharToMultiByte(codePage,
+        0,
+        src, srcLen, x, requiredSize, 0, 0);
+    if (!retval)
+    {
+        delete[] x;
+        return 0;
+    }
+
+    return x;
+}
+#endif
+
+void PwdFileWorker::ConvertToStorageEncoding(SecureString& data)
+{
+#ifdef _WIN32
+    //convert to UTF-16 from windows-1252
+    wchar_t* wText = CodePageToUnicode(1252, data.getUnsecureString());
+    data.UnsecuredStringFinished();
+
+    //convert from UTF-16 to UTF-8
+    char* utf8Text = UnicodeToCodePage(65001, wText);
+
+    //securely erase wText
+    memset(wText, 0, sizeof(wText));
+
+    //this also deletes utf8Text
+    data.assign(utf8Text);
+#else
+    //already utf8
+#endif
+}
+
+void PwdFileWorker::ConvertToLocalEncoding(SecureString data)
+{
+#ifdef _WIN32
+    //convert to UTF-16 from UTF-8
+    wchar_t* wText = CodePageToUnicode(65001, data.getUnsecureString());
+    data.UnsecuredStringFinished();
+
+    //convert from UTF-16 to windows-1252
+    char* ansiText = UnicodeToCodePage(1252, wText);
+
+    //securely erase wText
+    memset(wText, 0, sizeof(wText));
+
+    //this also deletes ansiText
+    data.assign(ansiText);
+#else
+    //already utf8
+#endif
+}
+
 void PwdFileWorker::ReadFile(string filename, int& length, char*& buffer)
 {
     std::ifstream is;
