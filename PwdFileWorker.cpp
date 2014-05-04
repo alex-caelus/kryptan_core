@@ -213,8 +213,8 @@ PwdList* PwdFileWorker::ParseFileContents(SecureString content)
     SecureString currDescription;
     SecureString currUsername;
     SecureString currPassword;
-    time_t currMtime;
-    time_t currCtime;
+    time_t currMtime = 0;
+    time_t currCtime = 0;
     PwdLabelVector currLabels;
 
     //for backwards compability
