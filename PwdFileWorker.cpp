@@ -90,8 +90,8 @@ char *UnicodeToCodePage(int codePage, const wchar_t *src)
 void PwdFileWorker::ConvertToStorageEncoding(SecureString& data)
 {
 #ifdef _WIN32
-    //convert to UTF-16 from windows-1252
-    wchar_t* wText = CodePageToUnicode(1252, data.getUnsecureString());
+    //convert to UTF-16 from system code page
+    wchar_t* wText = CodePageToUnicode(CP_ACP, data.getUnsecureString());
     data.UnsecuredStringFinished();
 
     //convert from UTF-16 to UTF-8
@@ -107,15 +107,15 @@ void PwdFileWorker::ConvertToStorageEncoding(SecureString& data)
 #endif
 }
 
-void PwdFileWorker::ConvertToLocalEncoding(SecureString data)
+void PwdFileWorker::ConvertToLocalEncoding(SecureString& data)
 {
 #ifdef _WIN32
     //convert to UTF-16 from UTF-8
     wchar_t* wText = CodePageToUnicode(65001, data.getUnsecureString());
     data.UnsecuredStringFinished();
 
-    //convert from UTF-16 to windows-1252
-    char* ansiText = UnicodeToCodePage(1252, wText);
+    //convert from UTF-16 to system code page
+    char* ansiText = UnicodeToCodePage(CP_ACP, wText);
 
     //securely erase wText
     memset(wText, 0, sizeof(wText));
