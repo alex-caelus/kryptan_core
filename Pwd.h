@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Pwd.h
  * Author: alexander
  *
@@ -16,18 +16,18 @@
 #include "SecureString.h"
 
 namespace Kryptan {
-	namespace Core {
+    namespace Core {
 
-		//forward declaration
-		class Pwd;
+        //forward declaration
+        class Pwd;
 
-		namespace Internal{
-			class PwdDescriptionValidator{
-			public:
-				virtual bool ValidateDescription(Pwd* pwd, const SecureString &newDescription) = 0;
-                                virtual ~PwdDescriptionValidator(){};
-			};
-		}
+        namespace Internal{
+            class PwdDescriptionValidator{
+            public:
+                virtual bool ValidateDescription(Pwd* pwd, const SecureString &newDescription) = 0;
+                virtual ~PwdDescriptionValidator(){};
+            };
+        }
 
         typedef std::vector<SecureString> PwdLabelVector;
 
@@ -37,59 +37,59 @@ namespace Kryptan {
         public:
 
             SecureString GetDescription() const;
-			SecureString GetUsername() const;
-			SecureString GetPassword() const;
+            SecureString GetUsername() const;
+            SecureString GetPassword() const;
 
-			time_t GetTimeLastModified() const;
-			std::string GetTimeLastModifiedString() const;
-			time_t GetTimeCreated() const;
-			std::string GetTimeCreatedString() const;
+            time_t GetTimeLastModified() const;
+            std::string GetTimeLastModifiedString() const;
+            time_t GetTimeCreated() const;
+            std::string GetTimeCreatedString() const;
 
             void SetDescription(const SecureString& desc);
             void SetUsername(const SecureString& usrname);
             void SetPassword(const SecureString& passwd);
 
-			bool HasLabel(const SecureString& label){
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
-				return std::find(mLabels.begin(), mLabels.end(), label) != mLabels.end();
-			}
-			PwdLabelVector GetLabels() {
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock); 
-				return PwdLabelVector(mLabels.begin(), mLabels.end());
-			}
+            bool HasLabel(const SecureString& label){
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+                return std::find(mLabels.begin(), mLabels.end(), label) != mLabels.end();
+            }
+            PwdLabelVector GetLabels() {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+                return PwdLabelVector(mLabels.begin(), mLabels.end());
+            }
 
         private:
-			Pwd(Internal::PwdDescriptionValidator* validator);
+            Pwd(Internal::PwdDescriptionValidator* validator);
             Pwd(const Pwd& orig);
             virtual ~Pwd();
 
-			void SetCTime(time_t);
-			void SetMTime(time_t);
-			void AddLabel(const SecureString& label);
-			void RemoveLabel(const SecureString& label);
-			void AddLabelNoMTime(const SecureString& label);
-			void RemoveLabelNoMTime(const SecureString& label);
+            void SetCTime(time_t);
+            void SetMTime(time_t);
+            void AddLabel(const SecureString& label);
+            void RemoveLabel(const SecureString& label);
+            void AddLabelNoMTime(const SecureString& label);
+            void RemoveLabelNoMTime(const SecureString& label);
 
 
-			void SetDescriptionNoMTime(const SecureString& desc);
-			void SetUsernameNoMTime(const SecureString& usrname);
-			void SetPasswordNoMTime(const SecureString& passwd);
+            void SetDescriptionNoMTime(const SecureString& desc);
+            void SetUsernameNoMTime(const SecureString& usrname);
+            void SetPasswordNoMTime(const SecureString& passwd);
 
-			void updateMTime();
+            void updateMTime();
 
             SecureString mDescription;
             SecureString mUsername;
             SecureString mPassword;
 
-			time_t mTimeCreated;
-			time_t mTimeLastModified;
+            time_t mTimeCreated;
+            time_t mTimeLastModified;
 
             std::list<SecureString> mLabels;
-			Internal::PwdDescriptionValidator* mValidator;
+            Internal::PwdDescriptionValidator* mValidator;
 
-			//only allow one thread to access this object at a time
-			mutable std::recursive_mutex mutex_lock;
-		};
+            //only allow one thread to access this object at a time
+            mutable std::recursive_mutex mutex_lock;
+        };
     }
 }
 

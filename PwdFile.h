@@ -16,9 +16,9 @@ namespace Kryptan {
             void CreateNew();
             void OpenAndParse(SecureString masterkey, bool useOldFormat = false);
             void Save(SecureString masterkey);
-			std::string SaveToString(SecureString masterkey, int mashIterations = 0);
-			SecureString GetCurrentContent();
-			void ReplaceContent(SecureString masterkey, std::string content);
+            std::string SaveToString(SecureString masterkey, int mashIterations = 0);
+            SecureString GetCurrentContent();
+            void ReplaceContent(SecureString masterkey, std::string content);
 
             PwdList* GetPasswordList();
             std::string GetFilename();
@@ -32,10 +32,10 @@ namespace Kryptan {
             std::string filename;
             PwdList* list;
 
-			bool isOpen;
+            bool isOpen;
 
-			//only allow one thread to access this object at a time
-			std::recursive_mutex mutex_lock;
+            //only allow one thread to access this object at a time
+            std::recursive_mutex mutex_lock;
         };
 
     }

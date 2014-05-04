@@ -25,34 +25,34 @@ namespace Kryptan {
             Pwd* CreatePwd(const SecureString& desciption, const SecureString& password);
             Pwd* CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password);
             void DeletePwd(Pwd* pwd);
-            
+
             PwdLabelVector AllLabels();
             PwdLabelVector FilterLabels(SecureString pattern);
             int CountPwds();
             int CountPwds(const SecureString& label);
-            
+
             bool AddPwdToLabel(Pwd* pwd, SecureString label);
             bool RemovePwdFromLabel(Pwd* pwd, SecureString label);
 
-			bool ValidateDescription(Pwd* pwd, const SecureString& newDescription) override;
+            bool ValidateDescription(Pwd* pwd, const SecureString& newDescription) override;
 
-			void ImportPwd(Pwd* pwd);
+            void ImportPwd(Pwd* pwd);
 
         private:
             PwdList(void);
             virtual ~PwdList(void);
             PwdList(const PwdList& obj);
 
-			//only accessible to PwdFileWorker
-			Pwd* CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified);
-			//only accessible to PwdFileWorker
-			bool AddPwdToLabelNoMTime(Pwd* pwd, SecureString label);
+            //only accessible to PwdFileWorker
+            Pwd* CreatePwd(const SecureString& desciption, const SecureString& username, const SecureString& password, time_t created, time_t modified);
+            //only accessible to PwdFileWorker
+            bool AddPwdToLabelNoMTime(Pwd* pwd, SecureString label);
 
             std::list<Pwd*> pwds;
             std::list<SecureString> existingLabels;
 
-			//only allow one thread to access this object at a time
-			std::recursive_mutex mutex_lock;
+            //only allow one thread to access this object at a time
+            std::recursive_mutex mutex_lock;
 
         };
     }

@@ -1,7 +1,7 @@
 /**
  * SECURESTRING VERSION 1.0
  * AUTHOR: Alexander Nilsson
- * Visit: http://www.caelus.org/proj/securestring for licence, 
+ * Visit: http://www.caelus.org/proj/securestring for licence,
  * usage, and documentation!
  */
 
@@ -39,7 +39,7 @@ namespace Kryptan {
 
             /**
              * Constructor:
-             * Simply creates an empty string, with size chunc of pre allocated 
+             * Simply creates an empty string, with size chunc of pre allocated
              * memory for storage (bytes).
              * @param size - bytes of memory to be allocated
              */
@@ -102,8 +102,8 @@ namespace Kryptan {
              * Assignment operator
              */
             inline SecureString&  operator= (const SecureString& other)
-			{
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+            {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 assign(other);
                 return *this;
             }
@@ -135,10 +135,10 @@ namespace Kryptan {
 
             /**
              * This returns a pointer to a plaintext copy of the string.
-             * There can only be one unsecured copy of this string at any one time, 
+             * There can only be one unsecured copy of this string at any one time,
              * multiple calls to this function will result in failure and NULL will
              * be returned.
-             * When the copy is no longer needed call UnsecuredStringFinished() to 
+             * When the copy is no longer needed call UnsecuredStringFinished() to
              * perform a safe delete on the string.
              * This copy is UnMutable and should thus not be modified!
              * @return pointer to an unsecured plaintext string, NULL on failure
@@ -147,28 +147,28 @@ namespace Kryptan {
 
             /**
              * This returns a pointer to a plaintext copy of the string.
-             * There can only be one unsecured copy of this string at any one time, 
+             * There can only be one unsecured copy of this string at any one time,
              * multiple calls to this function will result in failure and NULL will
              * be returned.
-             * When the copy is no longer needed call UnsecuredStringFinished() to 
+             * When the copy is no longer needed call UnsecuredStringFinished() to
              * perform a safe delete on the string.
              * This copy is Mutable and can be modified. On UnsecuredStringFinsished()
              * the modifications will be imported to the internal representation of
              * this SecureString.
-			 * NOTE: The string length will be equal to length() and not allocated()
-			 * Increasing the length by writing past the end of the buffer will result
-			 * in heap corruption.
+             * NOTE: The string length will be equal to length() and not allocated()
+             * Increasing the length by writing past the end of the buffer will result
+             * in heap corruption.
              * @return pointer to an unsecured plaintext string, NULL on failure
              */
             ssarr getUnsecureStringM();
 
             /**
-             * This returns a pointer to a plaintext copy of the string, containing 
+             * This returns a pointer to a plaintext copy of the string, containing
              * everything up until the next linefeed.
-             * There can only be one unsecured copy of this string at any one time, 
+             * There can only be one unsecured copy of this string at any one time,
              * multiple calls to this function will result in failure and NULL will
              * be returned.
-             * When the copy is no longer needed call UnsecuredStringFinished() to 
+             * When the copy is no longer needed call UnsecuredStringFinished() to
              * perform a safe delete on the string.
              * This copy is UnMutable and should thus not be modified!
              * @return pointer to an unsecured plaintext string, NULL on failure
@@ -177,7 +177,7 @@ namespace Kryptan {
 
             /**
              * This performs a safe delete on the unsecured copy of this string. If
-             * the copy is mutable (see getUnsecureStringM) then any changes to the 
+             * the copy is mutable (see getUnsecureStringM) then any changes to the
              * copy will be imported to the internal representation of this SecureString
              */
             void UnsecuredStringFinished();
@@ -187,10 +187,10 @@ namespace Kryptan {
              * @param pos - the position in the string to return
              * @return character at position pos, 0 on failure
              */
-			inline ssbyte at(ssnr pos) const {
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+            inline ssbyte at(ssnr pos) const {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 if (pos < length())
-                    return _key[pos] ^_data[pos];
+                    return _key[pos] ^ _data[pos];
                 else
                     return 0;
             }
@@ -199,35 +199,35 @@ namespace Kryptan {
              * This returns the current length of the string, excluding trailing null character
              * @return length of string
              */
-			inline ssnr length() const {
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
-                return ((ssnr) * _key) ^ _length;
+            inline ssnr length() const {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+                return ((ssnr)* _key) ^ _length;
             }
 
             /**
              * This returns the current amount of allocated bytes.
              * @return size of momory block
              */
-			inline ssnr allocated() const{
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
-                return ((ssnr) * _key) ^ _allocated;
+            inline ssnr allocated() const{
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+                return ((ssnr)* _key) ^ _allocated;
             }
 
             /**
-             * This allocates a size block of memory for the string and transfers 
+             * This allocates a size block of memory for the string and transfers
              * the current string to the new memory block.
              * @param size
              */
             void allocate(ssnr size);
 
             /**
-             * This resets the position of the linefeed pointer, so that 
+             * This resets the position of the linefeed pointer, so that
              * the next cal to getUnsecureNextline() will return the first line
              * in the string.
              */
-			void resetLinefeedPosition() {
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
-                _nexlinefeedposition = ((ssnr) * _key) ^ 0;
+            void resetLinefeedPosition() {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+                _nexlinefeedposition = ((ssnr)* _key) ^ 0;
             }
 
             /**
@@ -245,8 +245,8 @@ namespace Kryptan {
             bool equals(const char* s2) const;
 
             bool operator==(const SecureString& other) const
-			{
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+            {
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return equals(other);
             }
 
@@ -255,8 +255,8 @@ namespace Kryptan {
              * @param s2 - the string to compare with
              * @return the corresponding checksum of the string
              */
-			ssnr checksum() const{
-				std::lock_guard<std::recursive_mutex> lock(mutex_lock);
+            ssnr checksum() const{
+                std::lock_guard<std::recursive_mutex> lock(mutex_lock);
                 return _checksum;
             }
 
@@ -273,8 +273,8 @@ namespace Kryptan {
             ssnr _checksum;
             bool _mutableplaintextcopy;
 
-			//only allow one thread to access this object at a time
-			mutable std::recursive_mutex mutex_lock;
+            //only allow one thread to access this object at a time
+            mutable std::recursive_mutex mutex_lock;
         };
     }
 }
