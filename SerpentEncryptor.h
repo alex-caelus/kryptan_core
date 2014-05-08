@@ -1,7 +1,7 @@
 #ifndef TRIPLEENCRYPTOR_H
 #define TRIPLEENCRYPTOR_H
 
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 
 #include <cryptopp/secblock.h>
 using CryptoPP::SecByteBlock;

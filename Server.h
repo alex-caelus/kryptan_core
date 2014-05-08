@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 #include <string>
 
 namespace Kryptan

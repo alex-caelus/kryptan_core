@@ -5,7 +5,7 @@
 #include <list>
 #include <mutex>
 #include "Pwd.h"
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 
 namespace Kryptan {
     namespace Core {

@@ -2,7 +2,7 @@
 #define PWDFILEWORKER_H
 
 #include <string>
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 #include "PwdList.h"
 #include "Exceptions.h"
 

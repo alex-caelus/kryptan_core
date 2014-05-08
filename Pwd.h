@@ -13,7 +13,7 @@
 #include <list>
 #include <mutex>
 #include "Exceptions.h"
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 
 namespace Kryptan {
     namespace Core {

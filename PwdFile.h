@@ -2,7 +2,7 @@
 #define PWDFILE_H
 
 #include <string>
-#include "SecureString.h"
+#include "SecureString/SecureString.h"
 #include "PwdList.h"
 
 namespace Kryptan {
