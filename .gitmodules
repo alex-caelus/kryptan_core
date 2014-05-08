@@ -1,0 +1,3 @@
+[submodule "SecureString"]
+	path = SecureString
+	url = git@github.com:alex-caelus/SecureString.git
