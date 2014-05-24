@@ -6,8 +6,18 @@ using Kryptan::Core::SecureString;
 #include "Exceptions.h"
 using Kryptan::Core::KryptanBaseException;
 
-#include <cryptopp/osrng.h>
+//#define OS_RNG_AVAILABLE
+
+#ifdef OS_RNG_AVAILABLE
+# include <cryptopp/osrng.h>
 using CryptoPP::AutoSeededRandomPool;
+#else
+# include <cryptopp/randpool.h>
+  using CryptoPP::RandomPool;
+# ifdef _WIN32
+
+# endif
+#endif
 
 #include <cryptopp/gcm.h>
 using CryptoPP::GCM;
@@ -52,8 +62,30 @@ const int TARGET_ITERATION_TIME = 2; //seconds
 const int SALT_SIZE = 16; //bytes
 typedef uint32_t iter_t;
 
-//global
-AutoSeededRandomPool g_prng;
+RandomPool* getPrng()
+{
+#ifdef OS_RNG_AVAILABLE
+    static AutoSeededRandomPool g_prng;
+#else
+    static RandomPool g_prng;
+    static bool inited = false;
+    if (!inited)
+    {
+        const int SEED_LEN = 32;
+        byte seed[SEED_LEN];
+#ifdef _WIN32
+        //RtlGenRandom(seed, SEED_LEN);
+        //TODO: FIX THIS!
+#else
+#error Requires cryptographically secure seed
+#endif
+        g_prng.IncorporateEntropy(seed, SEED_LEN);
+        inited = true;
+    }
+
+#endif
+    return &g_prng;
+}
 
 //
 class EncryptionKeyImpl : public EncryptionKey
@@ -72,7 +104,7 @@ public:
         createdWithNumberOfIterations = nIterations;
 
         //fill with random data
-        g_prng.GenerateBlock(xor1, kLength + sLength);
+        getPrng()->GenerateBlock(xor1, kLength + sLength);
 
         //put key data into storage
         for (int i = 0; i < kLength; i++)
@@ -164,7 +196,7 @@ EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseRandomSalt(SecureStrin
     SecByteBlock salt(SALT_SIZE);
 
     //generate salt
-    g_prng.GenerateBlock(salt, salt.size());
+    getPrng()->GenerateBlock(salt, salt.size());
 
     return generateKeyFromPassphrase_p(passphrase, salt, mashIterations);
 }
@@ -218,7 +250,7 @@ std::string SerpentEncryptor::Encrypt(SecureString data, EncryptionKey* key)
 
         //generate iv
         SecByteBlock iv(IV_SIZE);
-        g_prng.GenerateBlock(iv, iv.size());
+        getPrng()->GenerateBlock(iv, iv.size());
 
         //put result here
         std::string encrypted(MAGIC_VALUE);

@@ -584,7 +584,7 @@ void PwdFileWorker::DeletePwdList(PwdList* list)
 void CreatePassword(PwdList* list, SecureString& desc, SecureString& user, SecureString& pass, deque<SecureString>& labels)
 {
     bool success = false;
-    Pwd* pwd;
+    Pwd* pwd = NULL;
     do{
         try{
             pwd = list->CreatePwd(desc, user, pass);

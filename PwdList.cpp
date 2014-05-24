@@ -7,15 +7,27 @@ using namespace Kryptan::Core;
 using namespace std;
 
 #ifdef _WIN32
-#include <boost/algorithm/string/find.hpp>
+#include <windows.h>
 
 const char* strcasestr(char* haystack, char* needle)
 {
-    using namespace boost;
-    iterator_range<char*> result = ifind_first(haystack, needle);
-    if (result) return result.begin();
+    int i;
+    int matchamt = 0;
 
-    return NULL;
+    for(i=0;i<haystack[i];i++)
+    {
+        if (tolower(haystack[i]) != tolower(needle[matchamt]))
+        {
+            matchamt = 0;
+        }
+        if (tolower(haystack[i]) == tolower(needle[matchamt]))
+        {
+            matchamt++;
+            if (needle[matchamt] == 0) return (char *)1;
+        }
+}
+
+    return 0;
 }
 
 #else
