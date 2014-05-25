@@ -13,10 +13,7 @@ using Kryptan::Core::KryptanBaseException;
 using CryptoPP::AutoSeededRandomPool;
 #else
 # include <cryptopp/randpool.h>
-  using CryptoPP::RandomPool;
-# ifdef _WIN32
-
-# endif
+using CryptoPP::RandomPool;
 #endif
 
 #include <cryptopp/gcm.h>
@@ -71,16 +68,22 @@ RandomPool* getPrng()
     static bool inited = false;
     if (!inited)
     {
+  #if defined(_WIN32) && defined(WINAPI_FAMILY_APP)
         const int SEED_LEN = 32;
-        byte seed[SEED_LEN];
-#ifdef _WIN32
-        //RtlGenRandom(seed, SEED_LEN);
-        //TODO: FIX THIS!
-#else
-#error Requires cryptographically secure seed
-#endif
-        g_prng.IncorporateEntropy(seed, SEED_LEN);
+        auto iBuffer = Windows::Security::Cryptography::CryptographicBuffer::GenerateRandom(SEED_LEN);
+        auto reader = Windows::Storage::Streams::DataReader::FromBuffer(iBuffer);
+        std::vector<unsigned char> data(reader->UnconsumedBufferLength);
+        if (!data.empty())
+            reader->ReadBytes(
+                ::Platform::ArrayReference<unsigned char>(
+                    &data[0], data.size()
+                )
+            );
+        g_prng.IncorporateEntropy(&data[0], SEED_LEN);
         inited = true;
+  #else
+    #error Requires cryptographically secure seed
+  #endif
     }
 
 #endif
