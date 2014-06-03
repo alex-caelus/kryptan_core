@@ -1,7 +1,7 @@
 #include "SerpentEncryptor.h"
 using Kryptan::Core::Internal::SerpentEncryptor;
 using Kryptan::Core::Internal::EncryptionKey;
-using Kryptan::Core::SecureString;
+using Caelus::Utilities::SecureString;
 
 #include "Exceptions.h"
 using Kryptan::Core::KryptanBaseException;

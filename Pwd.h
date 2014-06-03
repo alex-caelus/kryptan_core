@@ -15,6 +15,8 @@
 #include "Exceptions.h"
 #include "SecureString/SecureString.h"
 
+using namespace Caelus::Utilities;
+
 namespace Kryptan {
     namespace Core {
 

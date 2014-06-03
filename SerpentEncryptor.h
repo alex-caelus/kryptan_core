@@ -6,6 +6,8 @@
 #include <cryptopp/secblock.h>
 using CryptoPP::SecByteBlock;
 
+using namespace Caelus::Utilities;
+
 namespace Kryptan{
     namespace Core{
         namespace Internal{
