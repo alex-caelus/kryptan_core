@@ -3,7 +3,7 @@
 
 #include "SecureString/SecureString.h"
 
-#include <cryptopp/secblock.h>
+#include "cryptopp/secblock.h"
 using CryptoPP::SecByteBlock;
 
 namespace Kryptan{

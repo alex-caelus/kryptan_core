@@ -6,19 +6,19 @@ using Kryptan::Core::SecureString;
 #include "Exceptions.h"
 using Kryptan::Core::KryptanBaseException;
 
-#include <cryptopp/osrng.h>
+#include "cryptopp/osrng.h"
 using CryptoPP::AutoSeededRandomPool;
 
-#include <cryptopp/gcm.h>
+#include "cryptopp/gcm.h"
 using CryptoPP::GCM;
 
-#include <cryptopp/serpent.h>
+#include "cryptopp/serpent.h"
 using CryptoPP::Serpent;
 
-#include <cryptopp/secblock.h>
+#include "cryptopp/secblock.h"
 using CryptoPP::SecByteBlock;
 
-#include <cryptopp/filters.h>
+#include "cryptopp/filters.h"
 using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 using CryptoPP::AuthenticatedEncryptionFilter;
@@ -27,15 +27,15 @@ using CryptoPP::BufferedTransformation;
 using CryptoPP::AAD_CHANNEL;
 using CryptoPP::DEFAULT_CHANNEL;
 
-#include <cryptopp/base64.h>
+#include "cryptopp/base64.h"
 using CryptoPP::Base64Encoder;
 using CryptoPP::Base64Decoder;
 
-#include <cryptopp/sha.h>
+#include "cryptopp/sha.h"
 using CryptoPP::SHA512;
-#include <cryptopp/sha3.h>
+#include "cryptopp/sha3.h"
 //using CryptoPP::SHA3_512;
-#include <cryptopp/pwdbased.h>
+#include "cryptopp/pwdbased.h"
 using CryptoPP::PKCS5_PBKDF2_HMAC;
 
 //while developing

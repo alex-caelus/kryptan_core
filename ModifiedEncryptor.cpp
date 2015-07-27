@@ -3,10 +3,10 @@
 // default.cpp - written and placed in the public domain by Wei Dai
 
 #include "ModifiedEncryptor.h"
-#include <cryptopp/pch.h>
-#include <cryptopp/queue.h>
-#include <time.h>
-#include <memory>
+#include "cryptopp/pch.h"
+#include "cryptopp/queue.h"
+#include "time.h"
+#include "memory"
 
 NAMESPACE_BEGIN(CryptoPP)
 

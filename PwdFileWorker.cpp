@@ -1,6 +1,6 @@
 #include "PwdFileWorker.h"
 #include "ModifiedEncryptor.h"
-#include <cryptopp/hex.h>
+#include "cryptopp/hex.h"
 #include <fstream>
 #include <stdexcept>
 #include <stack>          // std::stack

@@ -2,7 +2,7 @@
 #include "SerpentEncryptor.h"
 #include "ModifiedEncryptor.h"
 #include "PwdFileWorker.h"
-#include <cryptopp/hex.h>
+//#include "cryptopp/hex.h"
 #include <fstream>
 #include <stdexcept>
 
