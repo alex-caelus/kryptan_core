@@ -13,8 +13,8 @@ using Kryptan::Core::KryptanBaseException;
 using CryptoPP::AutoSeededRandomPool;
 #else
 # include "cryptopp/randpool.h"
-using CryptoPP::RandomPool;
 #endif
+using CryptoPP::RandomPool;
 
 #include "cryptopp/gcm.h"
 using CryptoPP::GCM;
