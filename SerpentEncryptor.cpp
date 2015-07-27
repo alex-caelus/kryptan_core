@@ -1,13 +1,20 @@
 #include "SerpentEncryptor.h"
 using Kryptan::Core::Internal::SerpentEncryptor;
 using Kryptan::Core::Internal::EncryptionKey;
-using Kryptan::Core::SecureString;
+using Caelus::Utilities::SecureString;
 
 #include "Exceptions.h"
 using Kryptan::Core::KryptanBaseException;
 
-#include "cryptopp/osrng.h"
+//#define OS_RNG_AVAILABLE
+
+#ifdef OS_RNG_AVAILABLE
+# include "cryptopp/osrng.h"
 using CryptoPP::AutoSeededRandomPool;
+#else
+# include "cryptopp/randpool.h"
+using CryptoPP::RandomPool;
+#endif
 
 #include "cryptopp/gcm.h"
 using CryptoPP::GCM;
@@ -52,8 +59,36 @@ const int TARGET_ITERATION_TIME = 2; //seconds
 const int SALT_SIZE = 16; //bytes
 typedef uint32_t iter_t;
 
-//global
-AutoSeededRandomPool g_prng;
+RandomPool* getPrng()
+{
+#ifdef OS_RNG_AVAILABLE
+    static AutoSeededRandomPool g_prng;
+#else
+    static RandomPool g_prng;
+    static bool inited = false;
+    if (!inited)
+    {
+  #if defined(_WIN32) && defined(WINAPI_FAMILY_APP)
+        const int SEED_LEN = 32;
+        auto iBuffer = Windows::Security::Cryptography::CryptographicBuffer::GenerateRandom(SEED_LEN);
+        auto reader = Windows::Storage::Streams::DataReader::FromBuffer(iBuffer);
+        std::vector<unsigned char> data(reader->UnconsumedBufferLength);
+        if (!data.empty())
+            reader->ReadBytes(
+                ::Platform::ArrayReference<unsigned char>(
+                    &data[0], data.size()
+                )
+            );
+        g_prng.IncorporateEntropy(&data[0], SEED_LEN);
+        inited = true;
+  #else
+    #error Requires cryptographically secure seed
+  #endif
+    }
+
+#endif
+    return &g_prng;
+}
 
 //
 class EncryptionKeyImpl : public EncryptionKey
@@ -72,7 +107,7 @@ public:
         createdWithNumberOfIterations = nIterations;
 
         //fill with random data
-        g_prng.GenerateBlock(xor1, kLength + sLength);
+        getPrng()->GenerateBlock(xor1, kLength + sLength);
 
         //put key data into storage
         for (int i = 0; i < kLength; i++)
@@ -164,7 +199,7 @@ EncryptionKey* SerpentEncryptor::generateKeyFromPassphraseRandomSalt(SecureStrin
     SecByteBlock salt(SALT_SIZE);
 
     //generate salt
-    g_prng.GenerateBlock(salt, salt.size());
+    getPrng()->GenerateBlock(salt, salt.size());
 
     return generateKeyFromPassphrase_p(passphrase, salt, mashIterations);
 }
@@ -218,7 +253,7 @@ std::string SerpentEncryptor::Encrypt(SecureString data, EncryptionKey* key)
 
         //generate iv
         SecByteBlock iv(IV_SIZE);
-        g_prng.GenerateBlock(iv, iv.size());
+        getPrng()->GenerateBlock(iv, iv.size());
 
         //put result here
         std::string encrypted(MAGIC_VALUE);

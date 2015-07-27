@@ -89,7 +89,7 @@ char *UnicodeToCodePage(int codePage, const wchar_t *src)
 
 void PwdFileWorker::ConvertToStorageEncoding(SecureString& data)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(WINAPI_FAMILY)
     //convert to UTF-16 from system code page
     wchar_t* wText = CodePageToUnicode(CP_ACP, data.getUnsecureString());
     data.UnsecuredStringFinished();
@@ -102,14 +102,13 @@ void PwdFileWorker::ConvertToStorageEncoding(SecureString& data)
 
     //this also deletes utf8Text
     data.assign(utf8Text);
-#else
     //already utf8
 #endif
 }
 
 void PwdFileWorker::ConvertToLocalEncoding(SecureString& data)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(WINAPI_FAMILY)
     //convert to UTF-16 from UTF-8
     wchar_t* wText = CodePageToUnicode(65001, data.getUnsecureString());
     data.UnsecuredStringFinished();
@@ -122,7 +121,6 @@ void PwdFileWorker::ConvertToLocalEncoding(SecureString& data)
 
     //this also deletes ansiText
     data.assign(ansiText);
-#else
     //already utf8
 #endif
 }
@@ -584,7 +582,7 @@ void PwdFileWorker::DeletePwdList(PwdList* list)
 void CreatePassword(PwdList* list, SecureString& desc, SecureString& user, SecureString& pass, deque<SecureString>& labels)
 {
     bool success = false;
-    Pwd* pwd;
+    Pwd* pwd = NULL;
     do{
         try{
             pwd = list->CreatePwd(desc, user, pass);
