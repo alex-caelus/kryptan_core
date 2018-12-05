@@ -7,6 +7,7 @@
 #include <deque>          // std::deque
 #include <sstream>
 #include <ctime>
+#include <algorithm>
 
 using namespace Kryptan::Core;
 using namespace std;
@@ -486,7 +487,12 @@ SecureString PwdFileWorker::UnescapeTags(const char* str, int l)
 time_t PwdFileWorker::stringToTime(char* start, int length)
 {
     time_t t;
-    std::stringstream str(std::string(start, length));
+    std::string all = std::string(start, length);
+    //Remove commas (inserted by some locales)
+    all.erase(std::remove(all.begin(), all.end(), ','), all.end());
+    all.erase(std::remove(all.begin(), all.end(), ' '), all.end());
+    std::stringstream str(all);
+    str.imbue(std::locale::classic());
     str >> t;
     if (!str)
     {
@@ -499,6 +505,7 @@ SecureString PwdFileWorker::TimeToString(time_t time)
 {
     string t;
     std::ostringstream str;
+    str.imbue(std::locale::classic());
     str << time;
     //no need to securely delete this, it is not information that needs protecting
     return SecureString(str.str().c_str());
